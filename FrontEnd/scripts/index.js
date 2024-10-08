@@ -91,7 +91,6 @@ createFilterDefault()
 //Créer les filtres par catégories
 async function createFilterCategories() {
     const categories = await getCategories()
-    console.log(categories)
     categories.forEach(category => {
         const li = document.createElement("li")
         li.id = category.id
@@ -100,3 +99,26 @@ async function createFilterCategories() {
     });
 }
 createFilterCategories()
+//Filtrage des travaux 
+async function filterWorks() {
+    const works = await getWorks()
+    const categories = await getCategories()
+    const listFilters = document.querySelectorAll("#portfolio li")
+    listFilters.forEach(filter => {
+        filter.addEventListener("click",(event)=>{
+            // mis à jour de la gallery à chaque clic de filtre 
+            gallery.innerHTML = ""
+            const idFilter = event.target.id
+            if(idFilter === "default"){
+                displayWorksInGallery()
+            }else{
+                const worksFiltered = works.filter((work=> work.category.id == idFilter))
+                worksFiltered.forEach(work => {
+                    const figure = createFigureInGallery(work)
+                    gallery.appendChild(figure)
+                });
+            }
+        })
+    });   
+}
+filterWorks()
