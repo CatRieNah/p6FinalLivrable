@@ -1,5 +1,5 @@
 //Récupération des travaux à partir du back-end 
-async function getWorks() {
+export async function getWorks() {
     try {
         //Appel fetch 
         const response = await fetch("http://localhost:5678/api/works")
@@ -15,7 +15,7 @@ async function getWorks() {
 }
 //Ajouter les travaux 
 const gallery = document.querySelector("#portfolio .gallery")
-async function displayWorksInGallery() {
+ export async function displayWorksInGallery() {
     const works = await getWorks()
     //Mis à jour de la gallery à chaque ajout de photo
     gallery.innerHTML = ""
@@ -60,7 +60,7 @@ async function getCategories() {
     return categories
 } LORSQU'ON SUPPRIME LES TRAVAUX, ÇA SUPPRIME AUSSI LES FILTRES VU QUE LES CATEGORIES SONT AJOUTÉES À PARTIR DES DONNÉES RÉCUES */
 //Récupérer les catégories via back-end 
-async function getCategories() {
+export async function getCategories() {
     try {
         //Appel fetch 
         const response = await fetch("http://localhost:5678/api/categories")
