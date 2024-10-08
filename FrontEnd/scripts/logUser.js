@@ -1,5 +1,5 @@
 //Quand l'utilisateur est connecté,récupérer le token stocké dans localStorage 
-const token = window.localStorage.getItem("token")
+export const token = window.localStorage.getItem("token")
 function loginUser(){
     if(token){
         //Afficher la banner d'édition
