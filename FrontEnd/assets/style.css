@@ -320,7 +320,7 @@ hr{
 	border-radius: 60px;
 	cursor: pointer;
 }
-#portfolio li:hover{
+#portfolio .filter-active{
 	background-color: #1D6154;
 	color: #fff;
 }
