@@ -149,6 +149,7 @@ async function addPicture() {
     displayWorksInModal();
     displayWorksInGallery();
     resetForm();
+    deleteWork()
 }
 
 // Vérification des champs
@@ -194,6 +195,8 @@ function resetForm() {
     addGallery.innerHTML = `
         <span><i class="fa-regular fa-image"></i></span>
         <label for="image">+ Ajouter photo</label>
+        <input type="file" name="image" id="image" accept="image/png,image/jpeg">
+		<p>jpg, png : 4mo max</p>
     `;
     addGallery.appendChild(newInputFile);
     newInputFile.addEventListener("change", insertImages);
