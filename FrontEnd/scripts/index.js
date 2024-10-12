@@ -100,6 +100,22 @@ async function createFilterCategories() {
 }
 createFilterCategories()
 //Filtrage des travaux 
+async function changeBackgroundFilter() {
+    const categories = await getCategories()
+    const filters = document.querySelectorAll("#portfolio li")
+    for(let i = 0; i < filters.length; i++){
+        const filter = filters[i]
+        filter.addEventListener("click",(event)=>{
+            //reinitialise la class de toutes les filtres
+            filters.forEach(filter => {
+                filter.classList.remove("filter-active")
+            });
+            event.target.classList.add('filter-active')
+        })
+    }
+}
+changeBackgroundFilter()
+//Filtrage des travaux 
 async function filterWorks() {
     const works = await getWorks()
     const categories = await getCategories()
@@ -109,19 +125,13 @@ async function filterWorks() {
             // mis à jour de la gallery à chaque clic de filtre 
             gallery.innerHTML = ""
             const idFilter = event.target.id
-            //Réinitiliser la class de toutes les filtres 
-            listFilters.forEach(filter=>{
-                filter.classList.remove("filter-active")
-            })
             if(idFilter === "default"){
                 displayWorksInGallery()
-                document.getElementById("default").classList.add("filter-active")
             }else{
                 const worksFiltered = works.filter((work=> work.category.id == idFilter))
                 worksFiltered.forEach(work => {
                     const figure = createFigureInGallery(work)
                     gallery.appendChild(figure)
-                    document.getElementById(idFilter).classList.add("filter-active")
                 });
             }
         })
