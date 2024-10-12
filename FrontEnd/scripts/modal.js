@@ -62,7 +62,7 @@ export async function deleteWork(){
 deleteWork()
 /****FORMULAIRE MODALE ****/
 //Récupération des catégories pour select 
-const inputSelect = document.getElementById("category")
+const select = document.getElementById("category")
 async function displayOptionSelect(){
     const categories = await getCategories()
     categories.forEach(category => {
@@ -74,65 +74,82 @@ function createOption(category){
     const option = document.createElement("option")
     option.value = category.id
     option.textContent = category.name
-    inputSelect.appendChild(option)
+    select.appendChild(option)
 }
-// Affichage de l'image lors de selection de fichier 
-const inputFile = document.querySelector(".add_gallery input[type='file']");
-inputFile.addEventListener("change", insertImages);
-
-// Définir la fonction insertImages
-function insertImages() {
-    const files = inputFile.files; // Récupérer tous les fichiers sélectionnés
-
-    for (let i = 0; i < files.length; i++) {
-        const file = files[i]; // Fichier actuel
-        const reader = new FileReader(); // Créer un nouveau FileReader pour chaque fichier
-
-        // Lorsqu'un fichier est chargé
-        reader.onload = function(event) {
-            // Créer un élément img
-            const image = document.createElement("img");
-            image.src = event.target.result; // Utiliser le résultat de FileReader
-            image.style.width = "100%"; // Ajuster la taille de l'image
-
-            // Ajouter l'image à la galerie
-            const gallery = document.querySelector(".add_gallery");
-            gallery.appendChild(image);
-        };
-
-        // Lire le fichier sélectionné
-        reader.readAsDataURL(file); // Lire le fichier en tant que Data URL
-    }
-
-    // Cacher les éléments inutiles après la sélection
-    const imageIcon = document.querySelector(".fa-image");
-    const label = document.querySelector(".add_gallery label");
-    const p = document.querySelector(".add_gallery p");
-
-    if (imageIcon) {
-        imageIcon.style.display = "none";
-    }
-    if (label) {
-        label.style.display = "none";
-    }
-    if (p) {
-        p.style.display = "none";
+//Affichage de l'image lors de la selection de fichier
+const addGallery = document.querySelector(".add_gallery")
+let inputFile = document.getElementById("image")
+const iconImage = document.querySelector(".fa-image")
+const labelImage = document.querySelector(".add_gallery label");
+const pImage = document.querySelector(".add_gallery p");
+// Ajout eventlistener au changement dans inputFile
+inputFile.addEventListener("change",()=>{
+    insertImage()
+})
+//Fonction pour insérer une image 
+function insertImage() {
+    const files = inputFile.files
+    // Réinitialiser le texte d'erreur
+    pImage.textContent = "jpg, png : 4mo max";
+    pImage.style.color = ""; 
+    labelImage.style.display = "flex"
+    labelImage.style.justifyContent = "center"
+    labelImage.style.alignItems = "center"
+    if(files.length > 0){
+        const file = files[0] // Récupérer le premier fichier 
+        const fileSize = file.size 
+        const fileType = file.type 
+        //Vérifier si le fichier est en png ou jpeg et ≤ 4Mo
+        if((fileType === "image/png"|| fileType === "image/jpeg") && fileSize <= 4*1024*1024){
+            // créer une instance pour lire le fichier 
+            const reader = new FileReader()
+            reader.onload = function(event){
+                //Créer une image 
+                const image = document.createElement("img")
+                image.src = event.target.result // résultat de fileReader
+                image.style.width = "100%"
+                addGallery.appendChild(image)
+                //Supprimer les autres éléments de add_gallery
+                iconImage.style.display = "none"
+                labelImage.style.display = "none"
+                pImage.style.display = "none"
+            }
+            reader.readAsDataURL(file)
+        }else{
+            pImage.textContent = "Le fichier doit-être au format jpeg ou png et inférieur ou égal à 4Mo"
+            pImage.style.color = "red"
+        }
     }
 }
-
-// Envoi formulaire ajout photo
-const titleInput = document.getElementById("title");
-const categoryInput = document.getElementById("category");
-const imageInput = document.getElementById("image");
-const formUpload = document.querySelector(".upload_gallery form");
-
-formUpload.addEventListener("submit", (event) => {
+// fonction pour verifier tous les champs 
+const inputTitle = document.getElementById("title")
+const inputSubmitValider = document.querySelector(".upload_gallery input[type = 'submit']")
+function checkFields(){
+    const title = inputTitle.value
+    const category = select.value
+    const file = inputFile.files.length
+    if(title && category && file > 0){
+        inputSubmitValider.style.backgroundColor = "#1D6154"
+        inputSubmitValider.disabled = false
+        return true 
+    }else{
+        inputSubmitValider.style.backgroundColor = ""
+        inputSubmitValider.disabled = true
+        return false 
+    }
+}
+// Ajouter des écouteurs pour vérifier les champs lors des modifications
+inputTitle.addEventListener("input", checkFields);
+select.addEventListener("input", checkFields);
+inputFile.addEventListener("input", checkFields);
+// Fonction pour ajouter la photo dans la modale et gallerie
+const formUpload = document.querySelector(".upload_gallery form")
+formUpload.addEventListener("submit",(event) => {
     event.preventDefault();
-    if (checkFields()) {  // Vérifier les champs avant d'ajouter l'image
-        addPicture();
+    if(checkFields()){
+        addPicture()
     }
 });
-
 async function addPicture() {
     const formData = new FormData(formUpload);
     const response = await fetch("http://localhost:5678/api/works", {
@@ -140,64 +157,29 @@ async function addPicture() {
         headers: {"Authorization": `Bearer ${token}`},
         body: formData
     });
-    
     const data = await response.json();
-    
-    const addGallery = document.querySelector(".add_gallery");
-    addGallery.innerHTML = ""; // Vider la galerie après l'ajout
-    
     displayWorksInModal();
     displayWorksInGallery();
-    resetForm();
     deleteWork()
+    resetForm()
 }
+//Réinitialisation du formulaire 
+function resetForm(){
+    inputTitle.value = "";
+    select.value = "";
+    inputFile.value = ""; 
 
-// Vérification des champs
-function checkFields() {
-    const title = titleInput.value;
-    const category = categoryInput.value;
-    const image = imageInput.files.length;
+    // Réafficher les éléments 
+    iconImage.style.display = "flex";
+    labelImage.style.display = "flex";
+    pImage.style.display = "flex";
     
-    const submitButton = document.querySelector(".upload_gallery input[type='submit']");
-    if (title && category && image > 0) {
-        if (submitButton) {
-            submitButton.style.backgroundColor = "#1D6154"; // Couleur si tous les champs sont valides
-        }
-        return true; // Tous les champs sont remplis correctement
-    } else {
-        if (submitButton) {
-            submitButton.style.backgroundColor = ""; // Couleur par défaut si pas tous les champs valides
-        }
-        return false; // Un ou plusieurs champs ne sont pas remplis correctement
-    }
+    // Supprimer toutes les images ajoutées dynamiquement
+    const img = addGallery.querySelector("img");
+    addGallery.removeChild(img)
+    // Réinitialiser le bouton de soumission
+    inputSubmitValider.style.backgroundColor = "";
+    inputSubmitValider.disabled = true;
 }
 
-// Écoute des entrées pour vérifier les champs
-titleInput.addEventListener("input", checkFields);
-categoryInput.addEventListener("input", checkFields);
-imageInput.addEventListener("input", checkFields);
 
-// Réinitialiser le formulaire
-function resetForm() {
-    // Réinitialiser les champs du formulaire
-    titleInput.value = "";
-    categoryInput.value = "";
-
-    // Réinitialiser l'input de fichier en le recréant
-    const newInputFile = document.createElement("input");
-    newInputFile.type = "file";
-    newInputFile.name = "image";
-    newInputFile.id = "image";
-    newInputFile.accept = "image/png,image/jpeg";
-
-    // Remplacer l'ancien input par le nouveau
-    const addGallery = document.querySelector(".add_gallery");
-    addGallery.innerHTML = `
-        <span><i class="fa-regular fa-image"></i></span>
-        <label for="image">+ Ajouter photo</label>
-        <input type="file" name="image" id="image" accept="image/png,image/jpeg">
-		<p>jpg, png : 4mo max</p>
-    `;
-    addGallery.appendChild(newInputFile);
-    newInputFile.addEventListener("change", insertImages);
-}
