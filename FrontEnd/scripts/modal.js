@@ -164,7 +164,7 @@ async function addPicture() {
     resetForm()
 }
 //Réinitialisation du formulaire 
-function resetForm(){
+export function resetForm(){
     inputTitle.value = "";
     select.value = "";
     inputFile.value = ""; 

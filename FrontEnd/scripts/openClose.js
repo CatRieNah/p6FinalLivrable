@@ -1,3 +1,4 @@
+import { resetForm } from "./modal.js"
 //Ouverture de la modale 
 const modalContainer = document.querySelector(".modal-container")
 const pModif = document.querySelector(".modif p")
@@ -24,6 +25,7 @@ function openModalPicture(){
     arrowLeft.addEventListener("click", ()=>{
         modalPicture.style.display = "block"
         modalForm.style.display = "none"
+        resetForm()
     })
 }
 openModalPicture()
